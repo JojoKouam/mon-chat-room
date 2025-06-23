@@ -1,0 +1,52 @@
+/* frontend/src/pages/ChatPage.css */
+
+/* --- STYLE PAR DÉFAUT (ORDINATEUR) --- */
+.chat-page-container {
+  display: grid;
+  grid-template-columns: 72px 320px 1fr;
+  height: 100vh; /* Prend 100% de la hauteur de la fenêtre */
+  overflow: hidden; /* La "cage" qui empêche le débordement */
+}
+
+/* Le bouton retour est caché par défaut sur grand écran */
+.back-button {
+  display: none;
+}
+
+/* --- MEDIA QUERY POUR TABLETTES ET MOBILES (max-width: 768px) --- */
+@media (max-width: 768px) {
+  /* On change l'architecture pour l'animation */
+  .chat-page-container {
+    display: flex;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .secondary-sidebar-container,
+  .chat-window-container {
+    position: absolute;
+    top: 0;
+    left: 72px;
+    width: calc(100% - 72px);
+    height: 100%;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .back-button {
+    display: block; /* On affiche le bouton retour */
+  }
+
+  /* État initial : on voit la liste des salons */
+  .mobile-view-sidebar .secondary-sidebar-container { transform: translateX(0); z-index: 10; }
+  .mobile-view-sidebar .chat-window-container { transform: translateX(100%); }
+
+  /* État quand on clique sur un salon : on voit le chat */
+  .mobile-view-chat .secondary-sidebar-container { transform: translateX(-100%); }
+  .mobile-view-chat .chat-window-container { transform: translateX(0); z-index: 10; }
+}
+
+/* --- MEDIA QUERY POUR TRÈS PETITS ÉCRANS (max-width: 480px) --- */
+@media (max-width: 480px) {
+  .main-sidebar-container { display: none; }
+  .secondary-sidebar-container, .chat-window-container { left: 0; width: 100%; }
+}

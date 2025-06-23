@@ -1,0 +1,71 @@
+/* frontend/src/components/chat/ChatWindow.css */
+
+.chat-window-container {
+  flex-grow: 1;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.chat-window-container.placeholder {
+  justify-content: center;
+  align-items: center;
+  color: #6c757d;
+}
+
+.chat-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.header-info {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.header-info h3 { margin: 0; font-size: 20px; }
+.header-info span { margin: 0; color: #6c757d; font-size: 14px; }
+
+.typing-indicator-header { font-style: italic; color: #6c757d; font-size: 14px; min-height: 21px; width: 150px; text-align: right;}
+.back-button { width: 50px; text-align: left; }
+
+.messages-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-wrapper { display: flex; margin-bottom: 0.5rem; }
+.message-item { display: flex; max-width: 75%; }
+.message-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; margin-right: 1rem; flex-shrink: 0; }
+.message-content { display: flex; flex-direction: column; }
+.message-user { font-weight: 700; margin-bottom: 0.25rem; font-size: 15px; color: #1e293b; }
+.message-text { margin: 0; line-height: 1.4; padding: 8px 12px; border-radius: 18px; word-break: break-word; }
+.message-timestamp { font-size: 11px; color: #6c757d; margin-top: 4px; }
+
+.message-wrapper.other { justify-content: flex-start; }
+.message-wrapper.other .message-text { background-color: #e5e7eb; color: #1f2937; border-bottom-left-radius: 4px; }
+
+.message-wrapper.me { justify-content: flex-end; }
+.message-wrapper.me .message-text { background-color: #dbeafe; color: #1e3a8a; border-bottom-right-radius: 4px; }
+.message-wrapper.me .message-timestamp { align-self: flex-end; }
+.message-image {
+    max-width: 300px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+.back-button {
+  display: none;
+}
+@media (max-width: 768px) {
+  .back-button {
+    display: block;
+  }
+}

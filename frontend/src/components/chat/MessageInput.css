@@ -1,0 +1,111 @@
+.message-input-container {
+  padding: 1rem 1.5rem;
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  position: relative;
+}
+
+.message-input-container form {
+  display: flex;
+  align-items: center;
+}
+
+.message-input-container input {
+  flex-grow: 1;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 20px;
+  margin: 0 1rem;
+}
+
+.message-input-container input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.message-input-container button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: #ffffff;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.message-input-container button[type="submit"] {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* --- LE CONTENEUR DU PICKER --- */
+.emoji-picker-wrapper {
+  position: absolute;
+  bottom: calc(100% + 10px); 
+  left: 1rem;
+  z-index: 10;
+  border-radius: 12px; /* Un peu plus arrondi */
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+  border: 1px solid #dee2e6; /
+}
+
+/* Style général pour tout le picker */
+.emoji-picker-wrapper .EmojiPickerReact {
+  --epr-bg-color: #ffffff !important; /* Fond principal blanc */
+  --epr-text-color: #333 !important; /* Texte principal foncé */
+  --epr-search-input-bg-color: #f1f3f5 !important; /* Fond de la barre de recherche */
+  --epr-category-label-bg-color: #ffffff !important; /* Fond des titres de catégorie */
+  --epr-hover-bg-color: #e9ecef !important; /* Couleur au survol d'un emoji */
+  --epr-focus-bg-color: #dbeafe !important; /* Couleur au survol plus prononcée */
+  --epr-highlight-color: #007bff !important; /* Couleur de la catégorie active */
+}
+
+/* Style spécifique de la barre de recherche */
+.emoji-picker-wrapper .EmojiPickerReact .epr-search-container {
+  padding: 8px !important;
+}
+.emoji-picker-wrapper .EmojiPickerReact .epr-search {
+  border-radius: 6px !important;
+  border-color: #ced4da !important;
+}
+
+/* Style des boutons de catégorie */
+.emoji-picker-wrapper .EmojiPickerReact .epr-cat-btn {
+  filter: grayscale(1); /* Met les icônes en noir et blanc */
+  opacity: 0.6;
+}
+.emoji-picker-wrapper .EmojiPickerReact .epr-cat-btn:hover,
+.emoji-picker-wrapper .EmojiPickerReact .epr-cat-btn.epr-active-category-indicator {
+  filter: grayscale(0); /* Remet la couleur au survol/actif */
+  opacity: 1;
+}
+
+/* --- FIN DU STYLE DU PICKER --- */
+
+
+.emoji-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 10px;
+  color: #6c757d;
+}
+.emoji-button:hover {
+  color: #383d42;
+}
+
+.file-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 5px;
+  color: #6c757d;
+}

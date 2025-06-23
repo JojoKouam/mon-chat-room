@@ -1,0 +1,92 @@
+/* frontend/src/components/chat/MainSidebar.css */
+
+.main-sidebar-container {
+  width: 72px;
+  background-color: #e3e5e8;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* La clé est ici : on espace les éléments enfants (le groupe du haut et le groupe du bas) */
+  justify-content: space-between; 
+  align-items: center;
+  padding: 1rem 0;
+  flex-shrink: 0;
+  box-sizing: border-box; /* Important pour que le padding ne s'ajoute pas à la hauteur */
+}
+
+.main-sidebar-brand {
+  width: 48px;
+  height: 48px;
+  background-color: #5865f2;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: white;
+  margin-bottom: 0.5rem;
+  transition: border-radius 0.2s;
+  font-size: 24px; /* Taille de l'icône */
+}
+.main-sidebar-brand:hover {
+  border-radius: 50%;
+}
+
+.main-sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-item {
+  width: 48px;
+  height: 48px;
+  background-color: #ebedef;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 24px;
+  transition: all 0.2s;
+}
+
+.nav-item:hover, .nav-item.active {
+  background-color: #5865f2;
+  color: white;
+  border-radius: 16px;
+}
+
+/* --- NOUVEAU : Style pour les actions du bas --- */
+.main-sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.action-icon {
+  width: 48px;
+  height: 48px;
+  background-color: #d1d5db;
+  color: #374151;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 24px;
+  transition: all 0.2s;
+}
+
+.action-icon:hover {
+  background-color: #ef4444; /* Rouge pour la déconnexion */
+  color: white;
+  border-radius: 16px;
+}

@@ -1,0 +1,92 @@
+/* frontend/src/components/chat/JoinRoomModal.css */
+
+.join-room-modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  text-align: center; /* On centre tout le texte */
+}
+
+/* On retire l'en-tête et on met une croix plus stylée */
+.join-room-modal .modal-header {
+  display: flex;
+  justify-content: flex-end; /* On place la croix à droite */
+  border-bottom: none;
+  padding: 0;
+}
+.join-room-modal .close-button {
+  background: #f1f3f5;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #6c757d;
+  line-height: 1;
+}
+
+.join-room-modal .modal-body {
+  padding: 0;
+}
+
+/* Style pour le nom du salon */
+.join-room-modal h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 28px;
+  font-weight: 700;
+}
+/* Style pour la description */
+.join-room-modal p {
+  color: #6c757d;
+  font-size: 16px;
+  margin-bottom: 2rem;
+}
+
+/* Conteneur pour les boutons */
+.join-room-modal .modal-footer {
+  border-top: none;
+  padding: 0;
+  display: flex;
+  gap: 1rem;
+}
+
+/* Style commun pour les boutons */
+.join-room-modal .modal-footer button {
+  flex-grow: 1; /* Les boutons prennent la même largeur */
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.join-room-modal .modal-footer button:hover {
+  opacity: 0.9;
+}
+
+/* Style du bouton "Fermer" (on va le faire gris clair, le rouge est souvent pour la suppression) */
+.join-room-modal .btn-secondary {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+/* Style du bouton "Rejoindre" en vert */
+.join-room-modal .btn-primary {
+  background-color: #28a745;
+  color: white;
+}
+
+.back-button {
+  display: none;
+}
+@media (max-width: 768px) {
+  .back-button {
+    display: block;
+  }
+}

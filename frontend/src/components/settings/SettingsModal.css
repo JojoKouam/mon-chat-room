@@ -1,0 +1,79 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 800px;
+  height: 80%;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h2 {
+  margin: 0;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.modal-body {
+  display: flex;
+  flex-grow: 1;
+}
+
+.settings-menu {
+  width: 200px;
+  background-color: #f3f4f6;
+  padding: 1rem;
+  border-right: 1px solid #e5e7eb;
+}
+
+.settings-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.settings-menu li {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.settings-menu li.active {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+.settings-content {
+  flex-grow: 1;
+  padding: 1.5rem;
+}

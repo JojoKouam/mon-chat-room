@@ -1,0 +1,189 @@
+/* frontend/src/App.css */
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* Empêche le scroll sur la page entière */
+}
+
+
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f0f2f5;
+}
+
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.auth-card {
+  background: white;
+  padding: 2rem 2.5rem;
+  border-radius: 12px; /* Un peu plus arrondi */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Une ombre plus douce */
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.auth-card h1 {
+  margin-top: 0;
+  margin-bottom: 2rem; /* Plus d'espace */
+  font-size: 28px;
+  color: #1c1e21; /* Un noir moins dur */
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+/* --- MISES À JOUR DES INPUTS --- */
+.form-group input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #ddd; /* Bordure plus subtile */
+  border-radius: 6px;
+  font-size: 16px;
+  background-color: #f5f6f7; /* Le fond gris clair demandé */
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none; /* On enlève le contour bleu moche par défaut */
+  border-color: #007bff; /* On met en surbrillance la bordure au focus */
+  background-color: #fff; /* Fond blanc au focus */
+}
+/* -------------------------------- */
+
+
+/* ---  STYLE POUR L'ŒIL DU MOT DE PASSE --- */
+.password-input-container {
+  position: relative; /* Indispensable pour positionner l'icône à l'intérieur */
+}
+
+.password-toggle-icon {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  user-select: none; /* Empêche de sélectionner l'emoji comme du texte */
+  color: #8a8d91;
+}
+/* ---------------------------------------------------- */
+
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  margin-top: 1rem; /* Ajoute de l'espace au-dessus du bouton */
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.auth-links {
+  margin-top: 1.5rem;
+  font-size: 14px;
+}
+.auth-links p { margin: 0.5rem 0; }
+.auth-links a { color: #007bff; text-decoration: none; font-weight: 500; }
+.auth-links a:hover { text-decoration: underline; }
+
+/* --- NOUVEAUTÉ : STYLE POUR LES LISTES DÉROULANTES --- */
+.form-group select {
+  /* On copie les styles des inputs pour un look cohérent */
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  background-color: #f5f6f7;
+  box-sizing: border-box;
+  
+  /* On enlève l'apparence par défaut du navigateur */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* On ajoute notre propre flèche personnalisée */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+  
+  color: #555; /* Couleur de texte par défaut */
+}
+
+/* Change la couleur du texte une fois qu'une option est sélectionnée */
+.form-group select:valid {
+  color: #1c1e21;
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: #007bff;
+  background-color: #fff;
+}
+
+/* Style pour l'option placeholder désactivée */
+.form-group select option[disabled] {
+  color: #999;
+}
+
+/* --- MEDIA QUERIES POUR LA RESPONSIVITÉ --- */
+
+@media (max-width: 768px) {
+  /* Sur mobile, on change la grille pour que la SecondarySidebar soit cachée */
+  .chat-page-container {
+    grid-template-columns: 72px 1fr; /* On ne montre que la MainSidebar et la ChatWindow */
+  }
+
+  /* Pour un vrai projet mobile, on ajouterait un état pour afficher/cacher
+     la SecondarySidebar quand on clique sur un bouton "menu hamburger" */
+  .secondary-sidebar-container {
+    /* Pour cet exemple, on la cache simplement */
+    display: none;
+  }
+  
+  /* On adapte les paddings et les tailles de police */
+  .chat-header {
+    padding: 0.75rem 1rem;
+  }
+  .header-info h3 {
+    font-size: 18px;
+  }
+  
+  .messages-list {
+    padding: 1rem;
+  }
+
+  .message-wrapper .message-item {
+    max-width: 85%; /* Les bulles peuvent être un peu plus larges */
+  }
+  
+  .message-input-container {
+    padding: 0.75rem 1rem;
+  }
+}
+

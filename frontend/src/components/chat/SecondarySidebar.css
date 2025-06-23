@@ -1,0 +1,289 @@
+/* frontend/src/components/chat/Sidebar.css */
+
+.sidebar-container {
+  width: 320px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Indispensable pour que le profil se place en bas */
+}
+
+.sidebar-header {
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  flex-shrink: 0; /* Empêche l'en-tête de rétrécir */
+}
+
+/* Nouveau conteneur pour le contenu scrollable */
+.sidebar-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.rooms-list {
+  margin-bottom: 2rem; /* Espace entre les listes */
+}
+
+.rooms-list h3 {
+  font-size: 12px;
+  color: #6c757d;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.rooms-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.room-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.room-item:hover {
+  background-color: #e9ecef;
+}
+
+.room-item.active {
+  background-color: #dbeafe; /* Un bleu clair pour le salon actif */
+  color: #1e40af;
+}
+
+.room-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: bold;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.room-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Empêche le texte de déborder */
+}
+
+.room-name {
+  font-weight: 600;
+}
+
+.room-description {
+  font-size: 14px;
+  color: #6c757d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.room-item.active .room-description {
+  color: inherit;
+}
+
+/* --- NOUVEAU : STYLE POUR LE PROFIL UTILISATEUR --- */
+.user-profile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-top: 1px solid #dee2e6;
+  background-color: #f1f3f5;
+  flex-shrink: 0; /* Empêche le profil de rétrécir */
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+}
+
+.profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 0.75rem;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+}
+.profile-name {
+  font-weight: 600;
+}
+.profile-status {
+  font-size: 12px;
+  color: #28a745;
+  display: flex;
+  align-items: center;
+}
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #28a745;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.profile-actions {
+  margin-top: auto; /* La magie est ici ! */
+  display: flex;
+  flex-direction: column;
+  display: flex;
+  gap: 0.5rem;
+}
+.action-icon {
+  cursor: pointer;
+  font-size: 20px;
+  padding: 4px;
+  border-radius: 4px;
+}
+.action-icon:hover {
+  background-color: #dee2e6;
+}
+
+.secondary-sidebar-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Important */
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+}
+
+/* Ajouter ceci dans SecondarySidebar.css */
+.secondary-sidebar-header {
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  flex-shrink: 0; /* L'en-tête ne rétrécit pas */
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #e3e5e8;
+  box-sizing: border-box;
+}
+.search-bar input:focus {
+  outline: none;
+  background-color: white;
+  border-color: #5865f2;
+}
+
+/* --- NOUVEAU : STYLE POUR LA LISTE DE MESSAGES PRIVÉS (DMs) --- */
+
+.dms-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dm-item {
+  display: flex;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s;
+}
+
+.dm-item:hover {
+  background-color: #f8f9fa;
+}
+
+.dm-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #adb5bd;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.dm-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.dm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.dm-user-name {
+  font-weight: 600;
+}
+
+.dm-timestamp {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.dm-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dm-last-message {
+  font-size: 14px;
+  color: #6c757d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.dm-unread-badge {
+  background-color: #25d366; /* Vert WhatsApp */
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 12px;
+  min-width: 20px;
+  text-align: center;
+}
+/* Ajoute ça à la fin de SecondarySidebar.css */
+.no-rooms-message {
+  padding: 0 1rem;
+  font-size: 14px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.back-button {
+  display: none;
+}
+@media (max-width: 768px) {
+  .back-button {
+    display: block;
+  }
+}
