@@ -1,41 +1,38 @@
+// frontend/src/pages/ChatPage.jsx
+
 import React, { useState } from 'react';
-import { ChatProvider } from '../context/ChatContext';
-import MainSidebar from '../components/chat/MainSidebar';
-import SecondarySidebar from '../components/chat/SecondarySidebar';
+
+// On importe les 4 composants qui forment notre page
+import IconSidebar from '../components/chat/IconSidebar';
+import NewSidebar from '../components/chat/NewSidebar'; // Tu avais MainSidebar et SecondarySidebar, on les fusionne dans NewSidebar pour plus de simplicité
 import ChatWindow from '../components/chat/ChatWindow';
-import SettingsModal from '../components/settings/SettingsModal';
-import JoinRoomModal from '../components/chat/JoinRoomModal';
+import InfoPanel from '../components/chat/InfoPanel';
+
+// On importe le CSS qui va gérer notre layout
 import './ChatPage.css';
 
 export default function ChatPage() {
-  const [navMode, setNavMode] = useState('salons');
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [mobileView, setMobileView] = useState('sidebar');
-  const [roomToJoin, setRoomToJoin] = useState(null);
+  // Un état simple pour savoir si on affiche les "salons" ou les "messages privés"
+  const [sidebarMode, setSidebarMode] = useState('rooms'); // 'rooms' = salons, 'dms' = messages privés
 
   return (
-    <ChatProvider>
-      <div className={`chat-page-container mobile-view-${mobileView}`}>
-        <MainSidebar 
-          setNavMode={setNavMode} 
-          onOpenSettings={() => setIsSettingsOpen(true)} 
-        />
-        <SecondarySidebar 
-          mode={navMode} 
-          setMobileView={setMobileView}
-          onOpenJoinModal={setRoomToJoin}
-        />
-        <ChatWindow 
-          setMobileView={setMobileView} 
-        />
-        
-        {isSettingsOpen && <SettingsModal onClose={() => setIsSettingsOpen(false)} />}
-        
-        <JoinRoomModal 
-          room={roomToJoin} 
-          onClose={() => setRoomToJoin(null)}
-        />
-      </div>
-    </ChatProvider>
+    // C'est notre conteneur principal. Le CSS va lui donner un layout en grille.
+    <div className="chat-page-container">
+      
+      {/* 1ère colonne : La barre d'icônes. On lui passe la fonction pour changer de mode. */}
+ <IconSidebar 
+        currentMode={sidebarMode} 
+        onModeChange={setSidebarMode} // On utilise un nom de prop clair : "onModeChange"
+      />
+      {/* 2ème colonne : La liste des salons/messages. On lui passe le mode à afficher. */}
+      <NewSidebar mode={sidebarMode} />
+
+      {/* 3ème colonne : La fenêtre de conversation. */}
+      <ChatWindow />
+
+      {/* 4ème colonne : Le panneau d'informations. */}
+      <InfoPanel />
+
+    </div>
   );
 }

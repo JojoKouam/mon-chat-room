@@ -1,52 +1,60 @@
 /* frontend/src/pages/ChatPage.css */
 
-/* --- STYLE PAR DÉFAUT (ORDINATEUR) --- */
 .chat-page-container {
   display: grid;
-  grid-template-columns: 72px 320px 1fr;
-  height: 100vh; /* Prend 100% de la hauteur de la fenêtre */
-  overflow: hidden; /* La "cage" qui empêche le débordement */
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  
+  /* Layout par défaut pour les grands écrans */
+  grid-template-columns: 70px 320px 1fr 300px;
+  grid-template-areas: "icons sidebar main info"; /* On nomme nos zones */
 }
 
-/* Le bouton retour est caché par défaut sur grand écran */
-.back-button {
-  display: none;
-}
+/* On assigne chaque composant à sa zone */
+.icon-sidebar-container { grid-area: icons; }
+.new-sidebar-container { grid-area: sidebar; }
+.chat-window-container { grid-area: main; }
+.info-panel-container { grid-area: info; }
 
-/* --- MEDIA QUERY POUR TABLETTES ET MOBILES (max-width: 768px) --- */
-@media (max-width: 768px) {
-  /* On change l'architecture pour l'animation */
+
+/* --- GESTION DU RESPONSIVE --- */
+
+/* Pour les tablettes et petits écrans, on cache le panneau d'infos */
+@media (max-width: 1024px) {
   .chat-page-container {
-    display: flex;
-    position: relative;
-    overflow-x: hidden;
+    grid-template-columns: 70px 320px 1fr;
+    grid-template-areas: "icons sidebar main";
   }
 
-  .secondary-sidebar-container,
-  .chat-window-container {
-    position: absolute;
-    top: 0;
-    left: 72px;
-    width: calc(100% - 72px);
-    height: 100%;
-    transition: transform 0.3s ease-in-out;
+  .info-panel-container {
+    display: none; /* On le fait disparaître */
   }
-
-  .back-button {
-    display: block; /* On affiche le bouton retour */
-  }
-
-  /* État initial : on voit la liste des salons */
-  .mobile-view-sidebar .secondary-sidebar-container { transform: translateX(0); z-index: 10; }
-  .mobile-view-sidebar .chat-window-container { transform: translateX(100%); }
-
-  /* État quand on clique sur un salon : on voit le chat */
-  .mobile-view-chat .secondary-sidebar-container { transform: translateX(-100%); }
-  .mobile-view-chat .chat-window-container { transform: translateX(0); z-index: 10; }
 }
 
-/* --- MEDIA QUERY POUR TRÈS PETITS ÉCRANS (max-width: 480px) --- */
-@media (max-width: 480px) {
-  .main-sidebar-container { display: none; }
-  .secondary-sidebar-container, .chat-window-container { left: 0; width: 100%; }
+/* Pour les mobiles, on affiche une seule colonne à la fois */
+@media (max-width: 768px) {
+  .chat-page-container {
+    grid-template-columns: 100%; /* Une seule colonne */
+    grid-template-areas: "main"; /* Par défaut, on affiche le chat */
+  }
+  
+  /* On cache les sidebars par défaut sur mobile */
+  .icon-sidebar-container,
+  .new-sidebar-container {
+    display: none;
+  }
+  
+  /* --- Logique pour afficher les sidebars sur mobile --- */
+  /* On utilisera des états dans React pour ajouter ces classes */
+
+  .chat-page-container.show-icons .icon-sidebar-container {
+    display: flex; /* On peut le réafficher si besoin */
+    grid-area: icons; /* On s'assure qu'il prend la bonne place */
+  }
+
+  .chat-page-container.show-sidebar .new-sidebar-container {
+    display: flex; /* On peut le réafficher si besoin */
+    grid-area: sidebar; /* On s'assure qu'il prend la bonne place */
+  }
 }

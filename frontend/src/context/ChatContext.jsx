@@ -1,162 +1,180 @@
+// frontend/src/context/ChatContext.jsx
+
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import toast from 'react-hot-toast';
-import { io } from "socket.io-client";
-import AuthContext from './AuthContext';
+import { toast } from 'react-hot-toast';
+import { AuthContext } from './AuthContext';
+import { io } from 'socket.io-client';
 
+export const ChatContext = createContext();
 const socket = io("http://localhost:4000");
-const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
-    const { user } = useContext(AuthContext);
-    const [rooms, setRooms] = useState([]);
-    const [myRoomIds, setMyRoomIds] = useState([]);
-    const [messages, setMessages] = useState([]);
-    const [activeRoom, setActiveRoom] = useState(null);
-    const [memberCounts, setMemberCounts] = useState({});
-    const [loading, setLoading] = useState(true);
-    const [typingUsers, setTypingUsers] = useState([]);
-    
+  const { user } = useContext(AuthContext);
 
+  // États
+  const [rooms, setRooms] = useState([]);
+  const [myRoomIds, setMyRoomIds] = useState([]);
+  const [conversations, setConversations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [messages, setMessages] = useState([]);
+  const [activeRoom, setActiveRoom] = useState(null);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [activeEntityDetails, setActiveEntityDetails] = useState(null);
+  const [onlineUserIds, setOnlineUserIds] = useState([]);
+  const [typingUser, setTypingUser] = useState(null);
+
+  // --- EFFETS ---
     useEffect(() => {
-        const fetchInitialData = async () => {
-            if (!user) {
-                setLoading(false);
-                return;
-            }
-            try {
-                setLoading(true);
-                const res = await axios.get('http://localhost:4000/api/rooms');
-                setRooms(res.data.allRooms);
-                setMyRoomIds(res.data.myRoomIds);
-                // On sélectionne le premier salon de l'utilisateur par défaut
-                if (res.data.myRoomIds.length > 0) {
-                    selectRoom(res.data.myRoomIds[0]);
-                }
-            } catch (err) {
-                console.error("Erreur de chargement des données", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchInitialData();
-    }, [user]);
-
-    useEffect(() => {
-        socket.on('newMessage', (newMessage) => {
-            // On utilise une fonction pour éviter les problèmes de closure avec 'activeRoom'
-            setMessages(prevMessages => [...prevMessages, newMessage]);
-        });
-
-        socket.on('roomMemberCountUpdate', ({ roomId, count }) => {
-            setMemberCounts(prevCounts => ({ ...prevCounts, [roomId]: count }));
-        });
-
-         // --- NOUVEAU : Écouter les événements de typing ---
-        socket.on('userIsTyping', ({ username }) => {
-            // On ajoute l'utilisateur à la liste (s'il n'y est pas déjà)
-            setTypingUsers(prev => [...new Set([...prev, username])]);
-        });
-
-        socket.on('userStoppedTyping', () => {
-            // Pour ce cas simple, on vide la liste. On pourrait gérer ça plus finement.
-            setTypingUsers([]);
-        });
-
-        return () => {
-            socket.off('newMessage');
-            socket.off('roomMemberCountUpdate');
-            socket.off('userIsTyping');
-            socket.off('userStoppedTyping');
-        };
-    }, []);
-
-    const selectRoom = async (roomId) => {
-        if (activeRoom) socket.emit('leaveRoom', activeRoom); // Pas encore implémenté au back, mais bonne pratique
-        
-        socket.emit('joinRoom', roomId);
-        setActiveRoom(roomId);
-        try {
-            const res = await axios.get(`http://localhost:4000/api/rooms/${roomId}/messages`);
-            setMessages(res.data);
-        } catch (err) {
-            console.error(err);
-            setMessages([]);
+    const fetchInitialData = async () => {
+      if (!user) { setLoading(false); return; }
+      try {
+        setLoading(true);
+        const [roomsRes, convosRes] = await Promise.all([
+          axios.get('/api/rooms'),
+          axios.get('/api/conversations')
+        ]);
+        if (roomsRes.data) {
+          setRooms(roomsRes.data.allRooms.filter(room => room.type === 'public') || []);
+          setMyRoomIds(roomsRes.data.myRoomIds || []);
         }
-    };
-
-    const joinRoom = async (roomId) => {
-        try {
-            await axios.post(`http://localhost:4000/api/rooms/${roomId}/join`);
-            setMyRoomIds(prevIds => [...prevIds, roomId]);
-            selectRoom(roomId); // On sélectionne le salon automatiquement après l'avoir rejoint
-            toast.success("Salon rejoint !");
-        } catch (err) {
-            toast.error(err.response?.data?.message || "Impossible de rejoindre le salon.");
+        if (convosRes.data) {
+          setConversations(convosRes.data || []);
         }
+      } catch (err) {
+        console.error("Erreur de chargement des données initiales", err);
+      } finally {
+        setLoading(false);
+      }
     };
-    // Fonction pour envoyer un message
+    fetchInitialData();
+  }, [user]);
 
-    const sendMessage = (content, type = 'text') => { // On ajoute un paramètre 'type'
-    if (socket && activeRoom && user && content.trim() !== '') {
-        socket.emit('sendMessage', {
-            roomId: activeRoom,
-            message: content, // 'content' contient maintenant soit du texte, soit une URL
-            userId: user.id,
-            type: type // On envoie le type du message
-        });
+  useEffect(() => {
+    if (!user) return;
+    socket.emit('user_connected', user.id);
+    const listeners = {
+      'update-online-users': (userIds) => setOnlineUserIds(userIds),
+      'receive_message': (newMessage) => {
+        if (newMessage.room_id === activeRoom) setMessages((prev) => [...prev, newMessage]);
+        // On pourrait rafraîchir les convos ici pour mettre à jour l'aperçu du dernier message
+      },
+      'user_typing': ({ username }) => setTypingUser(username),
+      'user_stopped_typing': () => setTypingUser(null)
+    };
+    Object.keys(listeners).forEach(event => socket.on(event, listeners[event]));
+    return () => {
+      Object.keys(listeners).forEach(event => socket.off(event, listeners[event]));
+    };
+  }, [user, activeRoom]);
+
+  // --- FONCTIONS ---
+  const selectRoom = async (roomId) => {
+    if (roomId === activeRoom) return;
+    if (activeRoom) socket.emit('leave_room', activeRoom);
+    socket.emit('join_room', roomId);
+    setActiveRoom(roomId);
+    setIsLoadingMessages(true);
+    setActiveEntityDetails(null);
+
+    try {
+      // Marquer comme lu
+      await axios.post(`/api/read-status/${roomId}`);
+
+      const messagesRes = await axios.get(`/api/rooms/${roomId}/messages`);
+      setMessages(messagesRes.data);
+      
+      const convosRes = await axios.get('/api/conversations');
+      const updatedConversations = convosRes.data || [];
+      setConversations(updatedConversations);
+
+      const room = rooms.find(r => r.id === roomId);
+      const convo = updatedConversations.find(c => c.id === roomId);
+
+      if (room) {
+        setActiveEntityDetails(room);
+      } else if (convo) {
+        console.log("Tentative de sélection d'une conversation :", convo); // <--- AJOUTE ÇA
+        console.log("ID de l'autre utilisateur :", convo.other_user_id); // <--- ET ÇA
+        const userProfileRes = await axios.get(`/api/users/${convo.other_user_id}`);
+        setActiveEntityDetails(userProfileRes.data);
+      }
+    } catch {
+      toast.error("Impossible de charger les informations du salon.");
+    } finally {
+      setIsLoadingMessages(false);
     }
+  };
+
+  const startConversation = async (targetUserId) => {
+    try {
+      // 1. On crée/récupère le salon privé.
+      const res = await axios.post('/api/conversations/start', { id: targetUserId });
+      const { roomId } = res.data;
+
+      // 2. On rafraîchit la liste des conversations D'ABORD.
+      const convosRes = await axios.get('/api/conversations');
+      const updatedConversations = convosRes.data || [];
+      // On met à jour l'état pour que la sidebar soit correcte.
+      setConversations(updatedConversations);
+
+      // 3. MAINTENANT, on peut appeler selectRoom.
+      // Il trouvera la conversation car la liste est à jour dans la closure.
+      // C'est un peu "sale" mais c'est la façon la plus simple de s'en sortir.
+      // On simule une sélection manuelle pour être sûr.
+      if (roomId === activeRoom) return;
+      if (activeRoom) socket.emit('leave_room', activeRoom);
+      socket.emit('join_room', roomId);
+      setActiveRoom(roomId);
+      setIsLoadingMessages(true);
+      setActiveEntityDetails(null);
+
+      const messagesRes = await axios.get(`/api/rooms/${roomId}/messages`);
+      setMessages(messagesRes.data);
+
+      const convo = updatedConversations.find(c => c.id === roomId);
+      if (convo) {
+        const userProfileRes = await axios.get(`/api/users/${convo.other_user_id}`);
+        setActiveEntityDetails(userProfileRes.data);
+      }
+      setIsLoadingMessages(false);
+
+    } catch (error) {
+      console.error("Erreur pour démarrer la conversation", error);
+      toast.error("Impossible de démarrer la conversation.");
+      setIsLoadingMessages(false);
+    }
+  };
+
+  const joinRoom = async (roomId) => {
+    try {
+      await axios.post(`/api/rooms/${roomId}/join`);
+      toast.success("Salon rejoint !");
+      const res = await axios.get('/api/rooms');
+      setRooms(res.data.allRooms.filter(room => room.type === 'public') || []);
+      setMyRoomIds(res.data.myRoomIds || []);
+    } catch {
+      toast.error("Impossible de rejoindre le salon.");
+    }
+  };
+
+  const sendMessage = (content, type = 'text') => {
+    if (socket && activeRoom && content.trim() !== '') {
+      const messageData = { content, type, userId: user.id, roomId: activeRoom, username: user.username };
+      socket.emit('send_message', messageData);
+    }
+  };
+
+  const emitStartTyping = () => { if (socket && activeRoom) socket.emit('start_typing', { roomId: activeRoom, username: user.username }); };
+  const emitStopTyping = () => { if (socket && activeRoom) socket.emit('stop_typing', { roomId: activeRoom }); };
+
+  return (
+   <ChatContext.Provider value={{
+      user, rooms, myRoomIds, conversations, loading,
+      messages, activeRoom, isLoadingMessages, activeEntityDetails, onlineUserIds, typingUser,
+      joinRoom, selectRoom, startConversation, sendMessage, emitStartTyping, emitStopTyping
+    }}>
+      {children}
+    </ChatContext.Provider>
+  );
 };
-
-    // Fonctions pour gérer le typing
-
-    const startTyping = () => {
-        if (socket && activeRoom && user) {
-            socket.emit('startTyping', { roomId: activeRoom, username: user.username });
-        }
-    };
-    const stopTyping = () => {
-        if (socket && activeRoom) {
-            socket.emit('stopTyping', activeRoom);
-        }
-    };
-
-    // --- NOUVELLE FONCTION POUR DÉMARRER UNE CONVERSATION ---
-    const startPrivateChat = async (targetUserId) => {
-        // On affiche un toast de chargement pour l'UX
-        const toastId = toast.loading('Ouverture de la conversation...');
-
-        try {
-            // On appelle notre nouvelle API backend
-            const res = await axios.post('http://localhost:4000/api/conversations/start', { targetUserId });
-            
-            // L'API nous renvoie l'ID du salon (nouveau ou existant)
-            const { roomId } = res.data;
-            
-            // On sélectionne ce salon pour afficher les messages
-            selectRoom(roomId);
-            
-            // On met à jour le toast en succès
-            toast.success('Conversation ouverte !', { id: toastId });
-
-            return true; // On indique que l'opération a réussi
-
-        } catch (err) {
-            console.error("Impossible de démarrer la conversation", err);
-            // On met à jour le toast en erreur
-            toast.error("Impossible de démarrer la conversation.", { id: toastId });
-            return false; // On indique que l'opération a échoué
-        }
-    };
-
-    return (
-        <ChatContext.Provider value={{
-            rooms, myRoomIds, messages, activeRoom, memberCounts, loading,typingUsers, startTyping, stopTyping,
-            joinRoom, selectRoom, sendMessage, startPrivateChat
-        }}>
-            {children}
-        </ChatContext.Provider>
-    );
-};
-
-export default ChatContext;

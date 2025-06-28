@@ -1,0 +1,92 @@
+/* frontend/src/components/chat/InfoPanel.css */
+
+.info-panel-container {
+  background-color: #ffffff;
+  border-left: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+/* --- Section Profil --- */
+.profile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1.5rem;
+}
+
+.profile-avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+
+.profile-name {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.profile-status {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 4px 0 0;
+}
+
+/* --- Section Infos --- */
+.contact-info-section {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.info-item span {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.info-item p {
+  margin: 4px 0;
+  color: #6b7280;
+}
+
+/* --- Section Médias --- */
+.shared-media-section {
+  padding-top: 1.5rem;
+}
+.shared-media-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.section-header h4 { margin: 0; }
+.section-header a { font-size: 14px; color: #3b82f6; text-decoration: none; }
+
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.media-grid img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.more-media {
+  width: 100%;
+  height: 100px;
+  border-radius: 8px;
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+}

@@ -4,7 +4,10 @@ import React from 'react';
 import './MainSidebar.css';
 import { useNavigate } from 'react-router-dom'; // On importe useNavigate pour la navigation
 import AuthContext from '../../context/AuthContext'; // On importe le contexte ici aussi
+      
+import { AuthProvider } from './context/AuthContext.jsx';
 
+    
 
 // Récupère 'setNavMode' et 'onLogout' depuis les props
 export default function MainSidebar({ setNavMode, onOpenSettings }) {

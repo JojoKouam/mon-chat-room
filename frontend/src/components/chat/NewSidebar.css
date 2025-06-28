@@ -1,0 +1,229 @@
+/* frontend/src/components/chat/NewSidebar.css */
+
+.new-sidebar-container {
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.sidebar-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  box-sizing: border-box;
+}
+
+.sidebar-section {
+  padding: 1rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-header h4 {
+  margin: 0;
+  font-size: 16px;
+  color: #111827;
+}
+
+.section-header a {
+  font-size: 14px;
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+/* --- Style de la liste des contacts --- */
+.contacts-list {
+  display: flex;
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-x: auto; /* Permet le scroll horizontal */
+}
+
+.contact-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.contact-item img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* --- Style de la liste des conversations --- */
+.messages-section {
+  flex-grow: 1; /* Prend tout l'espace restant */
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden; /* Empêche cette section de déborder */
+}
+
+.conversations-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1; /* La liste elle-même prend l'espace */
+  overflow-y: auto; /* C'est ELLE qui scrolle */
+}
+
+.conversation-item {
+  display: flex;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  align-items: center; /* Centre verticalement */
+  gap: 12px;
+}
+.conversation-item:hover {
+  background-color: #f9fafb;
+}
+
+.conversation-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+}
+
+.convo-details {
+  flex-grow: 1;
+  overflow: hidden;
+}
+.convo-header, .convo-body {
+  display: flex;
+  justify-content: space-between;
+}
+.convo-name { 
+  font-weight: 600; 
+display: block;}
+
+.convo-time { 
+  font-size: 12px; 
+  color: #6b7280; 
+}
+.convo-last-message { 
+  font-size: 0.9rem; 
+  color: #6b7280; 
+  margin: 4px 0 0; 
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+}
+.convo-timestamp {
+  font-size: 0.8rem;
+  color: #8899a6;
+  margin-left: auto; /* Pousse l'heure complètement à droite */
+  white-space: nowrap;
+}
+.unread-badge {
+  background-color: #2ecc71; /* Vert, comme sur la maquette */
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+
+.conversation-item.active {
+  background-color: #eff6ff; /* Un bleu très clair */
+}
+
+.room-avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px; /* Bords carrés comme dans le design */
+  margin-right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  background-color: #60a5fa; /* Une couleur de base */
+}
+
+.no-items-message {
+  padding: 1rem;
+  color: #6b7280;
+  font-style: italic;
+  text-align: center;
+}
+
+/* Style pour la liste des utilisateurs en ligne */
+.online-users-list {
+  display: flex;
+  gap: 15px;
+  padding: 0 1rem; /* Même padding que les sections */
+  overflow-x: auto; /* Permet de scroller horizontalement */
+  /* Cacher la barre de scroll */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE 10+ */
+}
+.online-users-list::-webkit-scrollbar {
+  display: none; /* Safari et Chrome */
+}
+
+.online-user-item {
+  cursor: pointer;
+}
+
+.online-user-avatar {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #7b8c9d;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.online-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  background-color: #95a5a6; /* Gris par défaut pour "hors ligne" */
+  border-radius: 50%;
+  border: 2px solid white;
+  transition: background-color 0.3s;
+}
+.online-indicator.online {
+  background-color: #2ecc71;
+}
+/* frontend/src/components/chat/NewSidebar.css */
+
+.convo-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Aligne les éléments à droite */
+  gap: 4px;
+  margin-left: auto;
+}
+

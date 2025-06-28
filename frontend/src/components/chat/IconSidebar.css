@@ -1,0 +1,58 @@
+.icon-sidebar-container {
+  background-color: #f8f9fa;
+  border-right: 1px solid #e5e7eb;
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between; /* Pour pousser la déconnexion en bas */
+}
+
+.profile-icon img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.nav-icons ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.nav-icons li {
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.nav-icons li.active {
+  color: #3b82f6;
+  background-color: #e0e7ff;
+}
+
+.logout-icon {
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.user-avatar-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 20px;
+    cursor: pointer;
+}

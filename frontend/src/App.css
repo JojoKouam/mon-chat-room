@@ -151,39 +151,3 @@ body {
   color: #999;
 }
 
-/* --- MEDIA QUERIES POUR LA RESPONSIVITÉ --- */
-
-@media (max-width: 768px) {
-  /* Sur mobile, on change la grille pour que la SecondarySidebar soit cachée */
-  .chat-page-container {
-    grid-template-columns: 72px 1fr; /* On ne montre que la MainSidebar et la ChatWindow */
-  }
-
-  /* Pour un vrai projet mobile, on ajouterait un état pour afficher/cacher
-     la SecondarySidebar quand on clique sur un bouton "menu hamburger" */
-  .secondary-sidebar-container {
-    /* Pour cet exemple, on la cache simplement */
-    display: none;
-  }
-  
-  /* On adapte les paddings et les tailles de police */
-  .chat-header {
-    padding: 0.75rem 1rem;
-  }
-  .header-info h3 {
-    font-size: 18px;
-  }
-  
-  .messages-list {
-    padding: 1rem;
-  }
-
-  .message-wrapper .message-item {
-    max-width: 85%; /* Les bulles peuvent être un peu plus larges */
-  }
-  
-  .message-input-container {
-    padding: 0.75rem 1rem;
-  }
-}
-

@@ -1,81 +1,86 @@
 // frontend/src/components/chat/ChatWindow.jsx
 
 import React, { useContext, useEffect, useRef } from 'react';
-import ChatContext from '../../context/ChatContext';
-import AuthContext from '../../context/AuthContext';
+import { ChatContext } from '../../context/ChatContext';
+import { AuthContext } from '../../context/AuthContext'; // On doit importer AuthContext
 import MessageInput from './MessageInput';
 import './ChatWindow.css';
 
-const TypingIndicator = ({ typingUsers }) => {
-  if (typingUsers.length === 0) return <span></span>;
-  if (typingUsers.length === 1) return <span>{typingUsers[0]} est en train d'écrire...</span>;
-  if (typingUsers.length === 2) return <span>{typingUsers.join(' et ')} sont en train d'écrire...</span>;
-  return <span>Plusieurs personnes sont en train d'écrire...</span>;
-};
-
-// --- CORRECTION : La fonction accepte bien { setMobileView } comme une prop ---
-export default function ChatWindow({ setMobileView }) {
+export default function ChatWindow() {
   const { user } = useContext(AuthContext);
-  const { rooms, messages, activeRoom, memberCounts, typingUsers } = useContext(ChatContext);
-  const messagesEndRef = useRef(null);
+  const {
+    activeRoom, messages, isLoadingMessages, activeEntityDetails,
+    onlineUserIds, typingUser
+  } = useContext(ChatContext);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const endOfMessagesRef = useRef(null);
+  useEffect(() => {
+    endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, typingUser]);
 
-  useEffect(() => { scrollToBottom(); }, [messages]);
-
-  const currentRoom = rooms.find(room => room.id === activeRoom);
-  const currentMemberCount = memberCounts[activeRoom] || 0;
-  const otherTypingUsers = user ? typingUsers.filter(username => username !== user.username) : typingUsers;
-
+  // --- Cas de rendu initiaux ---
   if (!activeRoom) {
-    return (
-      <div className="chat-window-container placeholder">
-        <h3>Sélectionnez un salon pour commencer à discuter !</h3>
-      </div>
-    );
+    return <div className="chat-window-container placeholder"><h2>Sélectionnez un salon pour commencer à discuter !</h2></div>;
   }
+
+  // CORRECTION CRUCIALE : On met un état de chargement tant que les détails ne sont pas là
+  if (isLoadingMessages || !activeEntityDetails) {
+    return <div className="chat-window-container placeholder"><h3>Chargement du salon...</h3></div>;
+  }
+
+  // --- Logique d'affichage (maintenant on est sûr que activeEntityDetails existe) ---
+  const isDM = activeEntityDetails.type === undefined;
+  const isOtherUserOnline = isDM && onlineUserIds.includes(activeEntityDetails.id);
 
   return (
     <div className="chat-window-container">
       <div className="chat-header">
-        <button className="back-button" onClick={() => setMobileView('sidebar')}>
-          &lt;
-        </button>
-        <div className="header-info">
-          <h3>{currentRoom ? currentRoom.nom : 'Chargement...'}</h3>
-          {currentMemberCount > 0 && <span>{currentMemberCount} membre{currentMemberCount > 1 ? 's' : ''} en ligne</span>}
-        </div>
-        <div className="typing-indicator-header">
-          <TypingIndicator typingUsers={otherTypingUsers} />
-        </div>
+        {activeEntityDetails && (
+          isDM ? (
+          <div className="user-header">
+            <img src={activeEntityDetails.avatar_url || 'https://i.pravatar.cc/40?u=' + activeEntityDetails.id} alt="avatar" className="header-avatar" />
+            <div>
+              <h3>{activeEntityDetails.username}</h3>
+              <span className="header-status">{typingUser ? `${typingUser} est en train d'écrire...` : (isOtherUserOnline ? 'En ligne' : 'Hors ligne')}</span>
+            </div>
+          </div>
+        ) : (
+          <h3>{activeEntityDetails.nom}</h3>
+        )
+        )}
       </div>
+
       <div className="messages-list">
-        {messages.map((msg, index) => {
-          const isMe = user && msg.user_id === user.id;
-          return (
-            <div key={index} className={`message-wrapper ${isMe ? 'me' : 'other'}`}>
-              <div className="message-item">
-                {!isMe && (
-                  <div className="message-avatar" style={{backgroundColor: '#e5e7eb', color: '#374151'}}>
-                    {msg.username.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <div className="message-content">
-                   {msg.type === 'image' ? (
-        <img src={msg.content} alt="Image envoyée" className="message-image" />
-    ) : (
-        <p className="message-text">{msg.content}</p>
-    )}
-                  <span className="message-timestamp">{new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+        {messages.map((msg) => {
+          const isMe = msg.user_id === user.id;
+          if (msg.type === 'image') {
+            return (
+              <div key={msg.id} className={`message-wrapper ${isMe ? 'me' : 'other'}`}>
+                <div className="message-content image-content">
+                  {!isMe && <span className="message-user">{msg.username}</span>}
+                  <img src={msg.content} alt="Image partagée" className="message-image" />
+                  <span className="message-timestamp">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
+              </div>
+            );
+          }
+          return (
+            <div key={msg.id} className={`message-wrapper ${isMe ? 'me' : 'other'}`}>
+              {!isMe && <div className="message-avatar">{msg.username.charAt(0).toUpperCase()}</div>}
+              <div className="message-content">
+                {!isMe && <span className="message-user">{msg.username}</span>}
+                <p className="message-text">{msg.content}</p>
+                <span className="message-timestamp">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
               </div>
             </div>
           );
         })}
-        <div ref={messagesEndRef} />
+        
+        {/* L'indicateur de frappe a été déplacé dans le header, donc plus besoin ici */}
+        
+        <div ref={endOfMessagesRef} />
       </div>
+      
       <MessageInput />
     </div>
   );
