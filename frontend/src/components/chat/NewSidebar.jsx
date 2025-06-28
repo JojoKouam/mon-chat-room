@@ -4,18 +4,36 @@ import React, { useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { ChatContext } from '../../context/ChatContext';
 import JoinRoomModal from './JoinRoomModal';
+import RoomModal from './RoomModal'; // <-- Importer la nouvelle modale
 import NewConversationModal from './NewConversationModal';
 import './NewSidebar.css';
 
 export default function NewSidebar({ mode }) {
   const {
     rooms, myRoomIds, conversations, loading, selectRoom, activeRoom,
-    startConversation, onlineUserIds
+    startConversation, onlineUserIds, deleteRoom, user
   } = useContext(ChatContext);
-  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [roomToEdit, setRoomToEdit] = useState(null); // Pour savoir si on édite ou on crée
+
   const [roomToJoin, setRoomToJoin] = useState(null);
   const [isNewConversationModalOpen, setIsNewConversationModalOpen] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
+
+   const handleOpenCreateModal = () => {
+        setRoomToEdit(null); // On s'assure qu'on est en mode création
+        setIsModalOpen(true);
+    };
+
+    const handleOpenEditModal = (room) => {
+        setRoomToEdit(room); // On passe la salle à éditer
+        setIsModalOpen(true);
+    };
+    
+    const handleDelete = (e, roomId) => {
+        e.stopPropagation(); // Empêche de sélectionner la salle en même temps qu'on la supprime
+        deleteRoom(roomId);
+    };
 
   useEffect(() => {
     if (mode === 'dms') {
@@ -60,32 +78,57 @@ export default function NewSidebar({ mode }) {
         <div className="sidebar-header">
           <input type="text" placeholder="Rechercher..." />
         </div>
+
+         {/* AFFICHER LA MODALE */}
+            <RoomModal 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+                roomToEdit={roomToEdit} 
+            />
+
         <div className="sidebar-content">
           {mode === 'rooms' ? (
             <>
+            
               <div className="sidebar-section">
                 <h4>Mes Salons</h4>
                 <ul className="conversations-list">
                   {myJoinedRooms.map(room => (
                     <li key={room.id} className={`conversation-item ${activeRoom === room.id ? 'active' : ''}`} onClick={() => selectRoom(room.id)}>
-                      <div className="room-avatar-placeholder">{room.nom.charAt(0).toUpperCase()}</div>
-                      <div className="convo-details"><span className="convo-name">{room.nom}</span></div>
+                      <div className="room-avatar-placeholder">{room.nom?.charAt(0).toUpperCase() || '?'}</div>
+                      <div className="convo-details">
+                        <span className="convo-name">{room.nom}</span>
+                      </div>
+                      {user.id === room.owner_id && (
+                                        <div className="room-actions">
+                                            <button onClick={(e) => { e.stopPropagation(); handleOpenEditModal(room); }}>✏️</button>
+                                            <button onClick={(e) => handleDelete(e, room.id)}>🗑️</button>
+                                  </div>
+                                    )}
                     </li>
                   ))}
                 </ul>
               </div>
+
               <div className="sidebar-section">
-                <h4>Explorer</h4>
+
+                <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h4>Explorer</h4>
+                    <button className="add-btn" onClick={handleOpenCreateModal} style={{ cursor: 'pointer', border: 'none', background: '#e0e0e0', borderRadius: '50%', width: '24px', height: '24px', fontWeight: 'bold' }}>+</button>
+                </div>
+
                 <ul className="conversations-list">
-                  {exploreRooms.map(room => (
-                    <li key={room.id} className="conversation-item" onClick={() => setRoomToJoin(room)}>
-                      <div className="room-avatar-placeholder">{room.nom.charAt(0).toUpperCase()}</div>
-                      <div className="convo-details"><span className="convo-name">{room.nom}</span></div>
-                    </li>
-                  ))}
+                    {exploreRooms.map(room => (
+                        <li key={room.id} className={`conversation-item ${activeRoom === room.id ? 'active' : ''}`} onClick={() => setRoomToJoin(room)}>
+                            <div className="room-avatar-placeholder">{room.nom.charAt(0).toUpperCase() || '?'}</div>
+                            <div className="convo-details">
+                                <span className="convo-name">{room.name}</span>
+                            </div>
+                        </li>
+                    ))}
                 </ul>
-              </div>
-            </>
+            </div>
+        </>
           ) : (
             <>
               <div className="sidebar-section">

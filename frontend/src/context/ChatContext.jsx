@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // frontend/src/context/ChatContext.jsx
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
@@ -25,28 +26,30 @@ export const ChatProvider = ({ children }) => {
   const [typingUser, setTypingUser] = useState(null);
 
   // --- EFFETS ---
-    useEffect(() => {
-    const fetchInitialData = async () => {
-      if (!user) { setLoading(false); return; }
-      try {
-        setLoading(true);
-        const [roomsRes, convosRes] = await Promise.all([
-          axios.get('/api/rooms'),
-          axios.get('/api/conversations')
-        ]);
-        if (roomsRes.data) {
-          setRooms(roomsRes.data.allRooms.filter(room => room.type === 'public') || []);
-          setMyRoomIds(roomsRes.data.myRoomIds || []);
-        }
-        if (convosRes.data) {
-          setConversations(convosRes.data || []);
-        }
-      } catch (err) {
-        console.error("Erreur de chargement des données initiales", err);
-      } finally {
-        setLoading(false);
+  // Définir fetchInitialData en dehors de useEffect pour qu'il soit accessible partout
+  const fetchInitialData = async () => {
+    if (!user) { setLoading(false); return; }
+    try {
+      setLoading(true);
+      const [roomsRes, convosRes] = await Promise.all([
+        axios.get('/api/rooms'),
+        axios.get('/api/conversations')
+      ]);
+      if (roomsRes.data) {
+        setRooms(roomsRes.data.allRooms.filter(room => room.type === 'public') || []);
+        setMyRoomIds(roomsRes.data.myRoomIds || []);
       }
-    };
+      if (convosRes.data) {
+        setConversations(convosRes.data || []);
+      }
+    } catch (err) {
+      console.error("Erreur de chargement des données initiales", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchInitialData();
   }, [user]);
 
@@ -168,10 +171,67 @@ export const ChatProvider = ({ children }) => {
   const emitStartTyping = () => { if (socket && activeRoom) socket.emit('start_typing', { roomId: activeRoom, username: user.username }); };
   const emitStopTyping = () => { if (socket && activeRoom) socket.emit('stop_typing', { roomId: activeRoom }); };
 
+
+ const createRoom = async (roomData) => {
+    try {
+        await axios.post('/api/rooms', roomData);
+        
+        // La solution la plus fiable : on rafraîchit toutes les données.
+        // C'est exactement ce qu'on fait pour updateRoom.
+        fetchInitialData(); 
+
+        toast.success('Salle créée avec succès !');
+        return true; // Pour indiquer que l'opération a réussi
+    } catch (error) {
+        toast.error(error.response?.data?.message || "Erreur lors de la création.");
+        return false;
+    }
+};
+
+    const updateRoom = async (roomId, roomData) => {
+        try {
+            await axios.put(`/api/rooms/${roomId}`, roomData);
+            
+            // On rafraîchit toutes les données pour être sûr
+            // C'est la solution la plus simple et la plus fiable
+            fetchInitialData(); 
+            
+            toast.success('Salle mise à jour !');
+            return true;
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Erreur lors de la mise à jour.");
+            return false;
+        }
+    };
+
+    const deleteRoom = async (roomId) => {
+        // Ajoutons une confirmation avant une action aussi destructive
+        if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette salle ? Cette action est irréversible.")) {
+            return;
+        }
+        
+        try {
+            await axios.delete(`/api/rooms/${roomId}`);
+            
+            // On met à jour l'état en filtrant la salle supprimée
+            setMyRooms(prev => prev.filter(room => room.id !== roomId));
+            setRooms(prev => prev.filter(room => room.id !== roomId));
+            
+            // Si la salle supprimée était active, on la désélectionne
+            if (activeRoom === roomId) {
+                selectRoom(null);
+            }
+
+            toast.success('Salle supprimée.');
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Erreur lors de la suppression.");
+        }
+    };
+
   return (
    <ChatContext.Provider value={{
       user, rooms, myRoomIds, conversations, loading,
-      messages, activeRoom, isLoadingMessages, activeEntityDetails, onlineUserIds, typingUser,
+      messages, activeRoom, isLoadingMessages, activeEntityDetails, onlineUserIds, typingUser,createRoom,updateRoom,deleteRoom,
       joinRoom, selectRoom, startConversation, sendMessage, emitStartTyping, emitStopTyping
     }}>
       {children}
