@@ -24,17 +24,24 @@ exports.register = async (req, res) => {
         const salt = await bcrypt.genSalt(10); // Génère une "clé" de salage
         const hashedPassword = await bcrypt.hash(password, salt); // Hache le mot de passe
 
-        // 4. Insérer le nouvel utilisateur dans la base de données
-        await db.query(
-            'INSERT INTO users (username, email, password, age, gender, intention) VALUES (?, ?, ?, ?, ?, ?)',
-            [username, email, hashedPassword, age, gender, intention]
-        );
 
-        // 5. Envoyer une réponse de succès
-        res.status(201).json({
-             message: 'Utilisateur créé avec succès !',
-              username: username // On peut renvoyer le nom d'utilisateur pour confirmation
-            });
+
+        // 4. Créer l'URL de l'avatar par défaut en utilisant le service DiceBear
+        const defaultAvatarUrl = `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(username)}`;
+
+        // 5. Insérer le nouvel utilisateur dans la base de données (AVEC L'AVATAR)
+        const query = `
+            INSERT INTO users (username, email, password, age, gender, intention, avatar_url)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+        await db.query(query, [username, email, hashedPassword, age, gender, intention, defaultAvatarUrl]);
+        
+        // --- FIN DE LA PARTIE À AJOUTER/MODIFIER ---
+
+
+        // 6. Envoyer une réponse de succès
+        res.status(201).json({ message: 'Utilisateur créé avec succès !' });
+
 
     } catch (error) {
         // En cas d'erreur serveur, on envoie une réponse d'erreur générique

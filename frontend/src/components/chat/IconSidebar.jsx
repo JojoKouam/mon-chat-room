@@ -2,10 +2,10 @@
 import React, { useContext } from 'react';
 import './IconSidebar.css';
 import {AuthContext}from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link} from 'react-router-dom';
 
 // On reçoit les props du parent
-export default function IconSidebar({ currentSidebarMode, onModeChange }) {
+export default function IconSidebar({ currentSidebarMode, onModeChange, onSettingsClick }) {
   const userAvatar = "https://i.pravatar.cc/50?u=currentuser";
     const { user, logout } = useContext(AuthContext);
 
@@ -43,7 +43,9 @@ export default function IconSidebar({ currentSidebarMode, onModeChange }) {
             <span>👥</span>
           </li>
           <li title="Favoris"><span>🔖</span></li>
-          <li title="Paramètres"><span>⚙️</span></li>
+          <li title="Paramètres" onClick={onSettingsClick} style={{ cursor: 'pointer' }}>
+            <span>⚙️</span>
+          </li>
         </ul>
       </nav>
       <div className="logout-icon" onClick={handleLogout} title="Déconnexion">

@@ -7,6 +7,7 @@ import IconSidebar from '../components/chat/IconSidebar';
 import NewSidebar from '../components/chat/NewSidebar'; // Tu avais MainSidebar et SecondarySidebar, on les fusionne dans NewSidebar pour plus de simplicité
 import ChatWindow from '../components/chat/ChatWindow';
 import InfoPanel from '../components/chat/InfoPanel';
+import SettingsModal from '../components/chat/SettingsModal';
 
 // On importe le CSS qui va gérer notre layout
 import './ChatPage.css';
@@ -14,6 +15,7 @@ import './ChatPage.css';
 export default function ChatPage() {
   // Un état simple pour savoir si on affiche les "salons" ou les "messages privés"
   const [sidebarMode, setSidebarMode] = useState('rooms'); // 'rooms' = salons, 'dms' = messages privés
+      const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
     // C'est notre conteneur principal. Le CSS va lui donner un layout en grille.
@@ -23,6 +25,7 @@ export default function ChatPage() {
  <IconSidebar 
         currentMode={sidebarMode} 
         onModeChange={setSidebarMode} // On utilise un nom de prop clair : "onModeChange"
+        onSettingsClick={() => setIsSettingsOpen(true)}
       />
       {/* 2ème colonne : La liste des salons/messages. On lui passe le mode à afficher. */}
       <NewSidebar mode={sidebarMode} />
@@ -32,6 +35,7 @@ export default function ChatPage() {
 
       {/* 4ème colonne : Le panneau d'informations. */}
       <InfoPanel />
+      {isSettingsOpen && <SettingsModal onClose={() => setIsSettingsOpen(false)} />}
 
     </div>
   );
