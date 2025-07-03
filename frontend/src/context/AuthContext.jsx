@@ -1,15 +1,13 @@
-/* eslint-disable react-refresh/only-export-components */
-// frontend/src/context/AuthContext.jsx
-
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
-// CORRECTION 1 : On ajoute "export" ici
-export const AuthContext = createContext();
+const AuthContext = createContext();
 
-axios.defaults.baseURL = 'http://localhost:4000'; // Bonne pratique : définir l'URL de base
+export const useAuthContext = () => {
+  return useContext(AuthContext);
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -17,105 +15,63 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const loadUser = async () => {
+    const checkLoggedIn = async () => {
       const token = localStorage.getItem('chat-token');
       if (token) {
         axios.defaults.headers.common['x-auth-token'] = token;
         try {
-          const res = await axios.get('/api/auth/me'); // Utilise le chemin relatif
+          const res = await axios.get('/api/auth/me');
           setUser(res.data);
+        // eslint-disable-next-line no-unused-vars
         } catch (err) {
-          console.error('Token invalide, déconnexion.', err);
           localStorage.removeItem('chat-token');
           delete axios.defaults.headers.common['x-auth-token'];
-          setUser(null);
         }
       }
       setLoading(false);
     };
-    loadUser();
+    checkLoggedIn();
   }, []);
 
-  const logout = () => {
+  // CORRECTION : On enveloppe login et logout dans useCallback pour les stabiliser
+   const login = useCallback(async (email, password) => {
+    try {
+      const res = await axios.post('/api/auth/login', { email, password });
+      localStorage.setItem('chat-token', res.data.token);
+      axios.defaults.headers.common['x-auth-token'] = res.data.token;
+      
+      // La mise à jour de l'état `user` va déclencher le re-rendu de HomeRedirect,
+      // qui s'occupera de la redirection.
+      setUser(res.data.user); 
+      
+      toast.success('Connexion réussie !');
+      
+      // CORRECTION : On enlève cette ligne.
+      // navigate('/chat'); 
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Une erreur est survenue.');
+    }
+  }, []); 
+
+  const logout = useCallback(() => {
     localStorage.removeItem('chat-token');
     delete axios.defaults.headers.common['x-auth-token'];
     setUser(null);
     toast.success('Vous avez été déconnecté.');
     navigate('/login');
-  };
+  }, [navigate]);
+
+  // useMemo garantit que la valeur du contexte ne change que si user ou loading changent réellement
+  const value = useMemo(() => ({
+    user,
+    loading,
+    login,
+    logout,
+  }), [user, loading, login, logout]); // On ajoute login et logout aux dépendances
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loading, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 };
-
-// CORRECTION 2 : On supprime la ligne "export default" qui n'est plus nécessaire
-// export default AuthContext;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // frontend/context/AuthContext.jsx
-
-// import React, { createContext, useState, useEffect } from 'react';
-// import axios from 'axios';
-// import toast from 'react-hot-toast';
-
-// const AuthContext = createContext();
-
-// export const AuthProvider = ({ children }) => {
-//     const [user, setUser] = useState(null);
-//     const [loading, setLoading] = useState(true);
-
-//     useEffect(() => {
-//         const loadUser = async () => {
-//             const token = localStorage.getItem('chat-token');
-//             if (token) {
-//                 axios.defaults.headers.common['x-auth-token'] = token;
-//                 try {
-//                     const res = await axios.get('http://localhost:4000/api/auth/me');
-//                     setUser(res.data);
-//                 } catch (err) {
-//                     console.error("Token invalide, déconnexion.", err);
-//                     localStorage.removeItem('chat-token');
-//                     delete axios.defaults.headers.common['x-auth-token'];
-//                 }
-//             }
-//             setLoading(false);
-//         };
-//         loadUser();
-//     }, []);
-
-//     const logout = (navigate) => {
-//         localStorage.removeItem('chat-token');
-//         delete axios.defaults.headers.common['x-auth-token'];
-//         setUser(null);
-//         toast.success("Vous avez été déconnecté.");
-//         if (navigate) {
-//             navigate('/login');
-//         }
-//     };
-
-//     return (
-//         <AuthContext.Provider value={{ user, setUser, loading, logout }}>
-//             {children}
-//         </AuthContext.Provider>
-//     );
-// };
-
-// export default AuthContext;

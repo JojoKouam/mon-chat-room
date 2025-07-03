@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { ChatContext } from '../../context/ChatContext';
+import React, { useState, useEffect } from 'react';
+import { useChatContext } from '../../context/ChatContext';
 import './RoomModal.css';
 
 const RoomModal = ({ isOpen, onClose, roomToEdit }) => {
-    const { createRoom, updateRoom } = useContext(ChatContext);
+    const { createRoom, updateRoom } = useChatContext();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [isLoading, setIsLoading] = useState(false);

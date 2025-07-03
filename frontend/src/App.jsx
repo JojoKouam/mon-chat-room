@@ -1,50 +1,125 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 
-// Les imports des pages SANS l'extension .jsx, React s'en charge
+import { AuthProvider } from './context/AuthContext';
+import { ChatProvider } from './context/ChatContext';
+import ProtectedRoute from './components/routing/ProtectedRoute';
+
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ChatPage from './pages/ChatPage';
-import { Toaster } from 'react-hot-toast'; 
-import ProtectedRoute from './components/routing/ProtectedRoute'; // <-- IMPORTER NOTRE GARDE DU CORPS
 
-      
-import { ChatProvider } from './context/ChatContext.jsx';
-
-    
-import './App.css'; 
+import './App.css';
 
 function App() {
   return (
-
-     // à l'intérieur du BrowserRouter de main.jsx
-    <>
-      <Toaster
-        position="top-center"
-        reverseOrder={false}
-      />
+    <AuthProvider>
+      <Toaster position="top-center" reverseOrder={false} />
       <Routes>
+        {/* --- ROUTES PUBLIQUES --- */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        
-        {/* CORRECTION ARCHITECTURALE : La route principale protégée */}
+
+        {/* --- ROUTE PROTÉGÉE PRINCIPALE --- */}
+        {/* Enveloppe toutes les routes nécessitant une connexion */}
         <Route 
-          path="/*" // On utilise "/*" pour matcher toutes les routes internes au chat
+          path="/*" // Intercepte TOUT le reste
           element={
             <ProtectedRoute>
-              {/* Le ChatProvider enveloppe la ChatPage pour lui donner toutes les données du chat */}
-              <ChatProvider>
-                <ChatPage />
-              </ChatProvider>
+              <Routes>
+                {/* On définit les routes internes à la partie protégée */}
+                <Route 
+                  path="/chat/*" 
+                  element={
+                    <ChatProvider>
+                      <ChatPage />
+                    </ChatProvider>
+                  } 
+                />
+                {/* La route par défaut si on est connecté est /chat */}
+                <Route path="*" element={<Navigate to="/chat" />} />
+              </Routes>
             </ProtectedRoute>
-          } 
+          }
         />
       </Routes>
-    </>
+    </AuthProvider>
   );
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import React from 'react';
+// import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// // Les imports des pages SANS l'extension .jsx, React s'en charge
+// import LoginPage from './pages/LoginPage';
+// import RegisterPage from './pages/RegisterPage';
+// import ChatPage from './pages/ChatPage';
+// import { Toaster } from 'react-hot-toast'; 
+// import ProtectedRoute from './components/routing/ProtectedRoute'; // <-- IMPORTER NOTRE GARDE DU CORPS
+
+      
+// import { ChatProvider } from './context/ChatContext.jsx';
+
+    
+// import './App.css'; 
+
+// function App() {
+//   return (
+
+//      // à l'intérieur du BrowserRouter de main.jsx
+//     <>
+//       <Toaster
+//         position="top-center"
+//         reverseOrder={false}
+//       />
+//       <Routes>
+//         <Route path="/login" element={<LoginPage />} />
+//         <Route path="/register" element={<RegisterPage />} />
+        
+//         {/* CORRECTION ARCHITECTURALE : La route principale protégée */}
+//         <Route 
+//           path="/*" // On utilise "/*" pour matcher toutes les routes internes au chat
+//           element={
+//             <ProtectedRoute>
+//               {/* Le ChatProvider enveloppe la ChatPage pour lui donner toutes les données du chat */}
+//               <ChatProvider>
+//                 <ChatPage />
+//               </ChatProvider>
+//             </ProtectedRoute>
+//           } 
+//         />
+//       </Routes>
+//     </>
+//   );
+// }
+
+// export default App;
 
     
 

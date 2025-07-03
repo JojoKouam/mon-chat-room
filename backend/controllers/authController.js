@@ -67,7 +67,10 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: 'Email ou mot de passe incorrect.' });
         }
 
-        const payload = { user: { id: user.id } };
+        const payload = { 
+            user: { id: user.id },
+            username: user.username 
+         };
 
         // On signe le token...
         const token = jwt.sign(

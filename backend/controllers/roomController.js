@@ -2,27 +2,27 @@ const db = require('../config/db');
 
 // Récupérer tous les salons
 exports.getAllRooms = async (req, res) => {
+    const userId = req.user.id;
     try {
-        const userId = req.user.id;
+        // CORRECTION : On déstructure directement la réponse de db.query pour ne récupérer que les lignes de données.
+        const [allRooms] = await db.query("SELECT id, nom AS name, description, type, owner_id FROM rooms WHERE type = 'public' ORDER BY name ASC");
+        const [myRooms] = await db.query("SELECT room_id FROM room_members WHERE user_id = ?", [userId]);
 
-        // On fait deux requêtes en parallèle
-        const [allRooms] = await db.query('SELECT * FROM rooms ORDER BY nom ASC');
-        const [myRoomMemberships] = await db.query('SELECT room_id FROM room_members WHERE user_id = ?', [userId]);
+        // On transforme la liste des IDs en un simple tableau [1, 2, 5]
+        const myRoomIDs = myRooms.map(r => r.room_id);
 
-        // On transforme le résultat en un simple tableau d'IDs: [1, 2]
-        const myRoomIds = myRoomMemberships.map(m => m.room_id);
-
-        // On renvoie un objet contenant les deux listes
-        res.status(200).json({
-            allRooms,
-            myRoomIds
+        // On renvoie un objet contenant les deux listes de données pures
+        res.status(200).json({ 
+            allRooms: allRooms, 
+            myRoomIDs: myRoomIDs 
         });
 
     } catch (error) {
         console.error("Erreur lors de la récupération des salons :", error);
-        res.status(500).json({ message: 'Erreur serveur.' });
+        res.status(500).json({ message: "Erreur serveur." });
     }
 };
+
 
 // Rejoindre un salon
 exports.joinRoom = async (req, res) => {
@@ -55,23 +55,39 @@ exports.joinRoom = async (req, res) => {
 };
 
 // Récupérer les messages d'un salon spécifique
+// Dans backend/controllers/roomController.js
+
+// Récupérer les messages et les membres d'un salon spécifique
 exports.getRoomMessages = async (req, res) => {
-    try {
-        const { roomId } = req.params;
-        const [messages] = await db.query(
-            `SELECT m.*, u.username 
-             FROM messages m 
-             JOIN users u ON m.user_id = u.id 
-             WHERE m.room_id = ? 
-             ORDER BY m.created_at ASC`, // On les veut dans l'ordre chronologique
-            [roomId]
-        );
-        res.status(200).json(messages);
-    } catch (error) {
-        console.error("Erreur pour récupérer les messages du salon :", error);
-        res.status(500).json({ message: 'Erreur serveur.' });
-    }
+  const { id: roomId } = req.params;
+  try {
+    // CORRECTION FINALE : On déstructure le résultat de chaque requête pour ne garder que les données.
+    const [messages] = await db.query(
+      `SELECT m.id, m.content, m.created_at, m.type, m.user_id, u.username, u.avatar_url 
+       FROM messages m 
+       JOIN users u ON m.user_id = u.id 
+       WHERE m.room_id = ? 
+       ORDER BY m.created_at ASC`,
+      [roomId]
+    );
+
+    const [members] = await db.query(
+      `SELECT u.id, u.username, u.avatar_url 
+       FROM room_members rm 
+       JOIN users u ON rm.user_id = u.id 
+       WHERE rm.room_id = ?`,
+      [roomId]
+    );
+
+    // On renvoie un objet JSON propre avec les listes de messages et de membres.
+    res.status(200).json({ messages, members });
+
+  } catch (error) {
+    console.error("Erreur lors de la récupération des messages du salon :", error);
+    res.status(500).json({ message: "Erreur serveur." });
+  }
 };
+
 
 // Fonction pour créer une salle
 exports.createRoom = async (req, res) => {

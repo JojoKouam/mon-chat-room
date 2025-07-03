@@ -1,20 +1,23 @@
 /* eslint-disable no-unused-vars */
 import React, { useContext } from 'react';
 import './IconSidebar.css';
-import {AuthContext}from '../../context/AuthContext';
+import {useAuthContext}from '../../context/AuthContext';
 import { useNavigate, Link} from 'react-router-dom';
 
 // On reçoit les props du parent
 export default function IconSidebar({ currentSidebarMode, onModeChange, onSettingsClick }) {
   const userAvatar = "https://i.pravatar.cc/50?u=currentuser";
-    const { user, logout } = useContext(AuthContext);
+    const { user, logout } = useAuthContext();
 
   const navigate = useNavigate();
 
-  if (!user) {
-    return <div className="icon-sidebar-container"></div>;
-  }
+  // Si l'utilisateur n'est pas encore chargé, on peut afficher un placeholder
+    if (!user) {
+        return <div className="icon-sidebar-container" style={{ backgroundColor: '#e0e0e0' }}></div>;
+    }
 
+    // On calcule la source de l'avatar, comme dans la modale
+  const avatarSrc = user.avatar_url || `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(user.username)}`;
   const handleLogout = () => {
     logout(navigate);
   };
@@ -22,9 +25,8 @@ export default function IconSidebar({ currentSidebarMode, onModeChange, onSettin
   return (
     <div className="icon-sidebar-container">
       <div className="profile-icon" title={user.username}>
-        {/* On ajoute une sécurité supplémentaire au cas où username serait vide */}
-        {user.username ? user.username.charAt(0).toUpperCase() : '?'}
-      </div>
+                <img src={avatarSrc} alt="Mon avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}/>
+            </div>
       <nav className="nav-icons">
         <ul>
           {/* On utilise les props pour le onClick et la classe 'active' */}

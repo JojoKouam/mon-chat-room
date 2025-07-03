@@ -1,7 +1,7 @@
 // frontend/src/components/chat/InfoPanel.jsx
 
-import React, { useContext } from 'react';
-import { ChatContext } from '../../context/ChatContext';
+import React from 'react';
+import { useChatContext } from '../../context/ChatContext';
 import './InfoPanel.css';
 
 // --- Sous-composant pour afficher les infos d'un salon public ---
@@ -75,7 +75,7 @@ const UserProfileInfo = ({ user, messages }) => {
 
 // --- Le composant principal InfoPanel ---
 export default function InfoPanel() {
-  const { activeRoom, activeEntityDetails, messages } = useContext(ChatContext);
+  const { activeRoom, activeEntityDetails, messages } = useChatContext();
 
   if (!activeRoom || !activeEntityDetails) {
     return <div className="info-panel-container placeholder"></div>;

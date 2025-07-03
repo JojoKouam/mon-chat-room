@@ -1,86 +1,92 @@
-// frontend/src/components/chat/ChatWindow.jsx
-
-import React, { useContext, useEffect, useRef } from 'react';
-import { ChatContext } from '../../context/ChatContext';
-import { AuthContext } from '../../context/AuthContext'; // On doit importer AuthContext
+import React, { useEffect, useRef } from 'react';
+import { useChatContext } from '../../context/ChatContext';
+import { useAuthContext } from '../../context/AuthContext';
 import MessageInput from './MessageInput';
 import './ChatWindow.css';
 
 export default function ChatWindow() {
-  const { user } = useContext(AuthContext);
-  const {
-    activeRoom, messages, isLoadingMessages, activeEntityDetails,
-    onlineUserIds, typingUser
-  } = useContext(ChatContext);
-
+  const { 
+    messages, 
+    isLoadingMessages, 
+    activeEntityDetails,
+    typingUser
+  } = useChatContext();
+  const { user } = useAuthContext();
   const endOfMessagesRef = useRef(null);
+
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, typingUser]);
+  }, [messages]);
 
-  // --- Cas de rendu initiaux ---
-  if (!activeRoom) {
-    return <div className="chat-window-container placeholder"><h2>Sélectionnez un salon pour commencer à discuter !</h2></div>;
+  if (!activeEntityDetails) {
+    return <div className="chat-window-placeholder"><h3>Sélectionnez un salon pour commencer à discuter !</h3></div>;
   }
 
-  // CORRECTION CRUCIALE : On met un état de chargement tant que les détails ne sont pas là
-  if (isLoadingMessages || !activeEntityDetails) {
-    return <div className="chat-window-container placeholder"><h3>Chargement du salon...</h3></div>;
+  if (isLoadingMessages) {
+    return <div className="chat-window-placeholder"><h3>Chargement des messages...</h3></div>;
   }
 
-  // --- Logique d'affichage (maintenant on est sûr que activeEntityDetails existe) ---
-  const isDM = activeEntityDetails.type === undefined;
-  const isOtherUserOnline = isDM && onlineUserIds.includes(activeEntityDetails.id);
-
+  const isOtherUserTyping = typingUser && typingUser !== user.username;
+  const entityName = activeEntityDetails.name || activeEntityDetails.other_user_name;
+  
   return (
     <div className="chat-window-container">
       <div className="chat-header">
-        {activeEntityDetails && (
-          isDM ? (
-          <div className="user-header">
-            <img src={activeEntityDetails.avatar_url || 'https://i.pravatar.cc/40?u=' + activeEntityDetails.id} alt="avatar" className="header-avatar" />
-            <div>
-              <h3>{activeEntityDetails.username}</h3>
-              <span className="header-status">{typingUser ? `${typingUser} est en train d'écrire...` : (isOtherUserOnline ? 'En ligne' : 'Hors ligne')}</span>
-            </div>
-          </div>
-        ) : (
-          <h3>{activeEntityDetails.nom}</h3>
-        )
-        )}
+        <img 
+          src={activeEntityDetails.avatar_url || `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(entityName)}`} 
+          alt={entityName} 
+          className="header-avatar"
+        />
+        <div className="header-details">
+          <h3>{entityName}</h3>
+          {isOtherUserTyping && <span className="header-status">{typingUser} est en train d'écrire...</span>}
+        </div>
       </div>
 
       <div className="messages-list">
-        {messages.map((msg) => {
-          const isMe = msg.user_id === user.id;
-          if (msg.type === 'image') {
+        {messages.length > 0 ? (
+          messages.map((msg) => {
+            // SÉCURITÉ : Si un message n'a pas d'ID, on ne l'affiche pas pour éviter les erreurs.
+            if (!msg || !msg.id) return null;
+
+            const isMe = msg.user_id === user.id;
+
             return (
               <div key={msg.id} className={`message-wrapper ${isMe ? 'me' : 'other'}`}>
-                <div className="message-content image-content">
-                  {!isMe && <span className="message-user">{msg.username}</span>}
-                  <img src={msg.content} alt="Image partagée" className="message-image" />
-                  <span className="message-timestamp">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                {!isMe && (
+                  // L'avatar du message est DÉJÀ dans l'objet `msg` grâce à la jointure SQL.
+                  <img
+                    src={msg.avatar_url || `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(msg.username)}`}
+                    alt={msg.username}
+                    className="message-avatar"
+                  />
+                )}
+                <div className="message-content">
+                  {/* Le nom d'utilisateur est aussi DÉJÀ dans `msg` */}
+                  {!isMe && <span className="message-username">{msg.username}</span>}
+                  
+                  {/* On gère les images ou le texte */}
+                  {msg.type === 'image' ? (
+                    <img src={msg.content} alt="Image partagée" className="message-image" />
+                  ) : (
+                    <p className="message-text">{msg.content}</p>
+                  )}
+                  
+                  <span className="message-timestamp">
+                    {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
                 </div>
               </div>
             );
-          }
-          return (
-            <div key={msg.id} className={`message-wrapper ${isMe ? 'me' : 'other'}`}>
-              {!isMe && <div className="message-avatar">{msg.username.charAt(0).toUpperCase()}</div>}
-              <div className="message-content">
-                {!isMe && <span className="message-user">{msg.username}</span>}
-                <p className="message-text">{msg.content}</p>
-                <span className="message-timestamp">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-              </div>
-            </div>
-          );
-        })}
-        
-        {/* L'indicateur de frappe a été déplacé dans le header, donc plus besoin ici */}
-        
+          })
+        ) : (
+          <div className="no-messages-info">
+            <p>Soyez le premier à envoyer un message !</p>
+          </div>
+        )}
         <div ref={endOfMessagesRef} />
       </div>
-      
+
       <MessageInput />
     </div>
   );

@@ -1,12 +1,12 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
-import{ AuthContext }  from '../../context/AuthContext';
+import{ useAuthContext}  from '../../context/AuthContext';
       
 
     
 // Ce composant va envelopper les routes que l'on veut protéger
 export default function ProtectedRoute({ children }) {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading } = useAuthContext();
 
   // 1. Si on est encore en train de vérifier si un utilisateur est connecté, on n'affiche rien
   // (ou un spinner de chargement) pour éviter les "flashs" d'interface.

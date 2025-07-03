@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
-import {ChatContext}  from '../../context/ChatContext';
+import React from 'react';
+import {useChatContext}  from '../../context/ChatContext';
 import './JoinRoomModal.css';
 
 export default function JoinRoomModal({ room, onClose }) {
-  const { joinRoom } = useContext(ChatContext);
+  const { joinRoom } = useChatContext();
 
   if (!room) return null;
 

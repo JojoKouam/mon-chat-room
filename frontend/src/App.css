@@ -151,3 +151,47 @@ body {
   color: #999;
 }
 
+/* Pour les avatars dans la liste des conversations/salons */
+.conversation-item .room-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    min-width: 40px; /* Empêche le rétrécissement */
+    background-color: transparent; /* PAS de fond bleu */
+    border-radius: 50%;
+    overflow: hidden; /* Cache les coins de l'image si elle est carrée */
+}
+
+.conversation-item .room-avatar-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Assure que l'image remplit le cercle sans se déformer */
+}
+
+/* Pour la liste des utilisateurs en ligne */
+.online-user-avatar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    background-color: transparent; /* PAS de fond */
+    flex-shrink: 0;
+    border-radius: 50%; /* Le cercle */
+    background-color: #e0e0e0; /* Couleur de fond si l'image ne charge pas */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.online-user-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%; /* Rend l'image ronde */
+    object-fit: cover;
+}
+.message-avatar {
+    width: 35px;
+    height: 35px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+}

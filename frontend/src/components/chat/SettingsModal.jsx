@@ -1,13 +1,13 @@
 // frontend/src/components/chat/SettingsModal.jsx
 
-import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../../context/AuthContext';
+import React, { useState, useEffect} from 'react';
+import {useAuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import './SettingsModal.css'; // Ton CSS pour le style sombre
 
 const SettingsModal = ({ onClose }) => {
-    const { user, setUser } = useContext(AuthContext);
+    const { user, setUser } = useAuthContext();
     
     const [formData, setFormData] = useState({
         username: user?.username || '',
@@ -34,11 +34,13 @@ const SettingsModal = ({ onClose }) => {
     }, []);
 
     // --- DÉBUT DES AJOUTS POUR L'AVATAR ---
-    
+
+    // Définir avatarSrc ici pour l'utiliser dans le rendu
+    const avatarSrc = user?.avatar_url || `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(user?.username || '')}`;
+
     const handleAvatarUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         const formData = new FormData();
         formData.append('file', file);
         const toastId = toast.loading("Changement de l'avatar...");
@@ -99,7 +101,7 @@ const SettingsModal = ({ onClose }) => {
                 
                 <div className="profile-header">
                     <label htmlFor="avatar-file-input" className="avatar-upload-container">
-                        <img src={user.avatar_url} alt="avatar" className="profile-avatar-large"/>
+                        <img src={avatarSrc} alt="avatar" className="profile-avatar-large"/>
                         <div className="upload-overlay">Changer</div>
                     </label>
                     <input 
